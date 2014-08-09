@@ -9,9 +9,9 @@ var connect       = require('gulp-connect');
 var sass          = require('gulp-sass');
 var autoprefixer  = require('gulp-autoprefixer');
 var clean         = require('gulp-clean');
-
-//TODO:
-//  testing
+var mocha         = require('gulp-mocha');
+var karma         = require('gulp-karma');
+var protractor    = require('gulp-protractor').protractor;
 
 /*******************************************************
  *            File Paths and Values
@@ -67,11 +67,30 @@ var paths = {
   //Nodemon files to not watch
   nodemonIgnoreFiles: ['node_modules/**/*.js', 'client/**/*.js'],
 
-  publicPathsToClean: ['client/public/**/*.html', 'client/public/**/*.js', 'client/public/**/*.css']
+  publicPathsToClean: ['client/public/**/*.html', 'client/public/**/*.js', 'client/public/**/*.css'],
+
+  serverSideMochaTestFiles: ['server/**/*.unit.test.js'],
+
+  karmaTestFiles: ['client/app/**/*.unit.test.js'],
+
+  karmaConfigFile: 'client/app/config/karma.config.js',
+
+
+//Protractor Setup
+//Make sure you update the webdriver-manager after a clean npm install (it will add the Jar file and chrome driver):
+//  ./node_modules/protractor/bin/webdriver-manager update
+//Make sure the line 28 in the protractor config file is pointing to the right Jar file
+//  seleniumServerJar: '../../../node_modules/protractor/selenium/selenium-server-standalone-2.42.2.jar'
+//Make Sure the chromium driver on line 40 is pointing to the correct path
+//  chromeDriver: '../../../node_modules/protractor/selenium/chromedriver'
+
+  protractorTestFiles: ['client/app/**/*.e2e.test.js'],
+
+  protractorConfigFile: 'client/app/config/protractor.config.js'
 };
 
 /*******************************************************
- *            Client Side Gulp Tasks 
+ *            Client Side Build Tasks 
  ******************************************************/
 
 //Gulp connect
@@ -136,6 +155,7 @@ gulp.task('styles', function() {
     .pipe(connect.reload());
 });
 
+//Delete Public Files
 gulp.task('clean', function(){
   return gulp
     .src(paths.publicPathsToClean, {read:false})
@@ -143,7 +163,24 @@ gulp.task('clean', function(){
 });
 
 /*******************************************************
- *            Server Side Gulp Tasks 
+ *            Client Side Testing Tasks 
+ ******************************************************/
+
+gulp.task('karma', function(){
+  return gulp
+    .src(paths.karmaTestFiles)
+    .pipe(karma({configFile: paths.karmaConfigFile, action: 'run'}));
+});
+
+gulp.task('protractor', function(){
+  gulp.src(paths.protractorTestFiles)
+    .pipe(protractor({
+        configFile: paths.protractorConfigFile
+    }))    
+    .on('error', function(e) {console.log('Protractor Error: ', e);});
+});
+/*******************************************************
+ *            Server Side Build Tasks 
  ******************************************************/
 
 //Lint files with jshint
@@ -165,9 +202,22 @@ gulp.task('serve', function() {
 });
 
 /*******************************************************
+ *            Server Side Testing Tasks 
+ ******************************************************/
+
+gulp.task('serverUnitTests', function(){
+  return gulp
+    .src(paths.serverSideMochaTestFiles, {read: false})
+    .pipe(mocha({reporter: 'min'}));
+    // .on('error', function(){console.log('Error');});
+});
+
+/*******************************************************
  *            Defined Task Groups
  ******************************************************/
 
 gulp.task('clientBuildTasks', ['clean', 'connect', 'clientLint', 'templateCache', 'browserify', 'styles', 'index', 'clientWatch']);
-gulp.task('serverBuildTasks', ['serverLint', 'serve']);
+gulp.task('serverBuildTasks', ['serverLint', 'serverUnitTests', 'serve']);
+gulp.task('clientTestingTasks', ['karma', 'protractor']);
+gulp.task('serverTestingTasks', ['serverUnitTests']);
 gulp.task('default', ['serverBuildTasks', 'clientBuildTasks']);
