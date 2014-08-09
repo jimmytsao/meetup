@@ -3,11 +3,11 @@
 
 var angular = require('angular');
 angular
-	.module('app', [])
-	.config()
-	.run();
+	.module('app', []);
+	// .config()
+	// .run();
 
 //load template cache
-require('./templateCache.js');
+require('./modules/templateCache.js');
 
 })();
