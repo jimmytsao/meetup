@@ -2,8 +2,10 @@
 'use strict';
 
 var angular = require('angular');
+require('angular-ui-router');
+
 angular
-	.module('app', []);
+	.module('app', ['ui.router']);
 	// .config()
 	// .run();
 
