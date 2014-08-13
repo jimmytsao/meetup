@@ -5,7 +5,8 @@
   "description": "Template for angular, node, express application",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "rebuild": "rm -rf ./client/ionic/platforms && rm ./client/ionic/plugins/ios.json && mkdir ./client/ionic/platforms && (cd ./client/ionic;ionic platform ios) && (cd ./client/ionic;ionic build ios)",
+    "setup": "(cd ./client;ionic start newApp blank) && rm -rf ./client/newApp/scss && rm -rf ./client/newApp/www/css && rm -rf ./client/newApp/www/img && rm -rf ./client/newApp/www/css && mv ./client/newApp/www/js/app.js ./client/app/ && mv ./client/newApp/www/lib ./client/app/ && rm ./client/newApp/www/index.html && rm ./client/newApp/gulpfile.js && rm ./client/newApp/package.json && rm ./client/newApp/README.md && rm ./client/newApp/www/README.md && rm ./client/newApp/.bowerrc && rm -rf ./client/newApp/www/js && cp ./client/app/lib/ionic/js/ionic.bundle.js ./client/newApp/www && mv ./client/newApp ./client/ionic"
   },
   "keywords": [
     "angular",
@@ -30,17 +31,17 @@
     "gulp-nodemon": "^1.0.4",
     "gulp-protractor": "0.0.11",
     "gulp-sass": "^0.7.2",
+    "gulp-shell": "^0.2.9",
     "jshint-stylish": "^0.4.0",
     "karma": "^0.12.21",
     "karma-chrome-launcher": "^0.1.4",
     "karma-jasmine": "^0.1.5",
     "mocha": "^1.21.4",
     "protractor": "^1.0.0",
+    "run-sequence": "^0.3.6",
     "supertest": "^0.13.0"
   },
   "dependencies": {
-    "angular": "^1.2.19",
-    "angular-ui-router": "^0.2.10",
     "body-parser": "^1.6.2",
     "express": "^4.8.2",
     "morgan": "^1.2.2"

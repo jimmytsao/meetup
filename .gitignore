@@ -2,3 +2,4 @@ node_modules/
 bower_components/
 client/app/.DS_Store
 .DS_Store
+client/ionic/platforms

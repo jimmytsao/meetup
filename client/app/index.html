@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html>
   <head>
-    <title>Template</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="styles.css" rel="stylesheet">
+
+    <!-- ionic/angularjs js -->
+    <script src="ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="app.js"></script>
   </head>
-  <body>
-  Template 123
-    <script type="text/javascript" src='app.js'></script>
+  <body ng-app="starter">
+    <ion-pane>
+      <ion-header-bar class="bar-stable">
+        <h1 class="title">Template</h1>
+      </ion-header-bar>
+      <ion-content>
+      </ion-content>
+    </ion-pane>
   </body>
 </html>

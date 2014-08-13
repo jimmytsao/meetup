@@ -12,17 +12,20 @@ var clean         = require('gulp-clean');
 var mocha         = require('gulp-mocha');
 var karma         = require('gulp-karma');
 var protractor    = require('gulp-protractor').protractor;
+var shell         = require('gulp-shell');
+var runSequence   = require('run-sequence');
 
 /*******************************************************
  *            File Paths and Values
  ******************************************************/
 
+
 var paths = {
   clientScripts: {
     //All js files except the compiled templateCache.js file
-    src: ['client/app/**/*.js', '!client/app/modules/templateCache.js'],
+    src: ['client/app/**/*.js', '!client/app/modules/templateCache.js', '!client/app/lib/**/*.js'],
     //Destination of browserified files
-    dest: 'client/public'
+    dest: 'client/ionic/www'
   },
 
   htmlTemplates: {
@@ -38,13 +41,13 @@ var paths = {
     //Location of index.html file
     src: ['client/app/index.html'],
     //Public location of index.html file
-    dest: 'client/public'
+    dest: 'client/ionic/www'
   },
 
   sassFiles: {
     //sassfiles
-    src: ['client/app/**/*.scss'],
-    dest: 'client/public'
+    src: ['client/app/styles.scss'],
+    dest: 'client/ionic/www'
   },
 
   serverScripts: {
@@ -53,7 +56,7 @@ var paths = {
   },
 
   //Location of files to serve for livereload
-  livereloadRoot: 'client/public',
+  livereloadRoot: 'client/ionic/www',
 
   //Main js file client side
   mainClientAppFile: 'client/app/app.js',
@@ -67,7 +70,9 @@ var paths = {
   //Nodemon files to not watch
   nodemonIgnoreFiles: ['node_modules/**/*.js', 'client/**/*.js'],
 
-  publicPathsToClean: ['client/public/**/*.html', 'client/public/**/*.js', 'client/public/**/*.css'],
+  publicPathsToClean: ['client/ionic/www/**/*.html', 'client/ionic/www/**/*.js', 'client/ionic/www/**/*.css', '!client/ionic/www/ionic.bundle.js'],
+
+  buildPathsToClean: ['client/ionic/platforms/**/*'],
 
   serverSideMochaTestFiles: ['server/**/*.unit.test.js'],
 
@@ -162,6 +167,7 @@ gulp.task('clean', function(){
     .pipe(clean());
 });
 
+
 /*******************************************************
  *            Client Side Testing Tasks 
  ******************************************************/
@@ -216,6 +222,8 @@ gulp.task('serverUnitTests', function(){
  *            Defined Task Groups
  ******************************************************/
 
+//Delete Ionic Platform Files
+gulp.task('buildIos', shell.task(['npm run-script rebuild']));
 gulp.task('clientBuildTasks', ['clean', 'connect', 'clientLint', 'templateCache', 'browserify', 'styles', 'index', 'clientWatch']);
 gulp.task('serverBuildTasks', ['serverLint', 'serverUnitTests', 'serve']);
 gulp.task('clientTestingTasks', ['karma', 'protractor']);
