@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "rebuild": "rm -rf ./client/ionic/platforms && rm ./client/ionic/plugins/ios.json && mkdir ./client/ionic/platforms && (cd ./client/ionic;ionic platform ios) && (cd ./client/ionic;ionic build ios)",
-    "setup": "(cd ./client;ionic start newApp blank) && rm -rf ./client/newApp/scss && rm -rf ./client/newApp/www/css && rm -rf ./client/newApp/www/img && rm -rf ./client/newApp/www/css && mv ./client/newApp/www/js/app.js ./client/app/ && mv ./client/newApp/www/lib ./client/app/ && rm ./client/newApp/www/index.html && rm ./client/newApp/gulpfile.js && rm ./client/newApp/package.json && rm ./client/newApp/README.md && rm ./client/newApp/www/README.md && rm ./client/newApp/.bowerrc && rm -rf ./client/newApp/www/js && cp ./client/app/lib/ionic/js/ionic.bundle.js ./client/newApp/www && mv ./client/newApp ./client/ionic"
+    "setup": "(cd ./client;ionic start newApp blank) && rm -rf ./client/newApp/scss && rm -rf ./client/newApp/www/css && rm -rf ./client/newApp/www/img && rm -rf ./client/newApp/www/css && mv ./client/newApp/www/js/app.js ./client/app/ && mv ./client/newApp/www/lib ./client/app/ && rm ./client/newApp/www/index.html && rm ./client/newApp/gulpfile.js && rm ./client/newApp/package.json && rm ./client/newApp/README.md && rm ./client/newApp/www/README.md && rm ./client/newApp/.bowerrc && rm -rf ./client/newApp/www/js && cp ./client/app/lib/ionic/js/ionic.bundle.js ./client/newApp/www && mv ./client/newApp ./client/ionic && ./node_modules/protractor/bin/webdriver-manager update"
   },
   "keywords": [
     "angular",
