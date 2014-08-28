@@ -1,21 +1,16 @@
 'use strict';
 
-if (!process.env){
+if (!process.env.isProduction){
   var devDbConnect = require('./devConstants.js').dbConnectionInfo;
 }
-
-var host = process.env.dbHost || devDbConnect.host;
-var user = process.env.dbUser || devDbConnect.user;
-var password = process.env.dbPassword || devDbConnect.password;
-var database = process.env.dbDatabase || devDbConnect.database;
 
 var knex = require('knex')({
   client: 'pg',
   connection: {
-    host     : host,
-    user     : user,
-    password : password,
-    database : database,
+    host     : process.env.dbHost || devDbConnect.host,
+    user     : process.env.dbUser || devDbConnect.user,
+    password : process.env.dbPassword || devDbConnect.password,
+    database : process.env.dbDatabase || devDbConnect.database,
     charset  : 'utf8'
   }
 });

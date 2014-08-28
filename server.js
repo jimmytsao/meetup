@@ -12,4 +12,4 @@ require('./server/config/middleware.js')(app, express);
 require('./server/config/dbConnectConfig.js');
 
 app.listen(port);
-console.log('Listening on port '+port);
+console.log('Listening on port ' + port);
