@@ -17,7 +17,7 @@
     if (isCordovaDevice){
       loginUrlWithParameters = loginUrlWithParameters + facebookParams.oauthRedirectUrl;
     } else {
-      loginUrlWithParameters = loginUrlWithParameters + 'http://localhost:8000/oauthcallback.html';
+      loginUrlWithParameters = loginUrlWithParameters + facebookParams.oauthRedirectUrlNonCordova;
     }
 
     $window._app.oauthCallback = function (url) {

@@ -4,3 +4,5 @@ client/app/.DS_Store
 .DS_Store
 client/ionic/platforms
 devConstants.js
+templateCache.js
+azure.err
