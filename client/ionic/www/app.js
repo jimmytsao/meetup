@@ -48,7 +48,7 @@
 
 })();
 
-},{"./modules/login/login.js":2,"./modules/signup/signup.js":6,"./modules/templateCache.js":8,"lodash":10,"restangular":11}],2:[function(require,module,exports){
+},{"./modules/login/login.js":2,"./modules/signup/signup.js":6,"./modules/templateCache.js":8,"lodash":9,"restangular":10}],2:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -88,12 +88,9 @@
 })();
 
 },{"./loginAuthValues.js":3,"./loginControllers.js":4,"./loginFacebookAuthService.js":5}],3:[function(require,module,exports){
-(function (process){
 'use strict';
 
 (function(){
-
-  console.log('process.env.fbCallbackNonCordova: ', process.env.fbCallbackNonCordova);
 
   angular
     .module('app.login.authValues',[])
@@ -101,11 +98,10 @@
       loginUrl: 'https://www.facebook.com/dialog/oauth',
       appId: 678308422257930,
       oauthRedirectUrl: 'http://localhost/#/auth/fb',
-      oauthRedirectUrlNonCordova: process.env.fbCallbackNonCordova || 'http://localhost:8000/oauthcallback.html'
+      oauthRedirectUrlNonCordova: 'http://jtmeetup.azurewebsites.net/oauthcallback.html'
     });
 })();
-}).call(this,require("oMfpAn"))
-},{"oMfpAn":9}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -236,71 +232,6 @@
 angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<button ng-click=\'LoginController.signup()\'>fb</button>\n");
 $templateCache.put("signup/signupTemplate.html","<button ui-sref=\'login\'>login</button>\n");}]);
 },{}],9:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    if (canPost) {
-        var queue = [];
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-}
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}],10:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -7089,7 +7020,7 @@ process.chdir = function (dir) {
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * Restful Resources service for AngularJS apps
  * @version v1.4.0 - 2014-04-25 * @link https://github.com/mgonto/restangular
