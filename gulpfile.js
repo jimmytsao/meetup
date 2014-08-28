@@ -44,6 +44,10 @@ var paths = {
     dest: 'client/ionic/www'
   },
 
+  oauthcallback: {
+    src: ['client/app/oauthcallback.html']
+  },
+
   sassFiles: {
     //sassfiles
     src: ['client/app/styles.scss'],
@@ -110,7 +114,7 @@ gulp.task('connect', function() {
 gulp.task('templateCache', function(){
 	gulp
     .src(paths.htmlTemplates.src)
-		.pipe(templateCache(paths.templateCacheName,{module: paths.ngAppName}))
+		.pipe(templateCache(paths.htmlTemplates.templateCacheName,{module: paths.ngAppName}))
 		.pipe(gulp.dest(paths.htmlTemplates.dest));
 });
 
@@ -138,6 +142,7 @@ gulp.task('clientWatch', function(){
   gulp.watch(paths.htmlTemplates.src, ['templateCache', 'browserify']);
   gulp.watch(paths.sassFiles.src, ['styles']);
   gulp.watch(paths.index.src, ['index']);
+  gulp.watch(paths.oauthcallback.src, ['oauthcallback']);
 });
 
 //Move index.html file into public folder
@@ -147,6 +152,15 @@ gulp.task('index', function() {
     .pipe(gulp.dest(paths.index.dest))
     .pipe(connect.reload());
 });
+
+//Move oauthcallback.html file into public folder
+gulp.task('oauthcallback', function() {
+  gulp
+    .src(paths.oauthcallback.src)
+    .pipe(gulp.dest(paths.index.dest))
+    .pipe(connect.reload());
+});
+
 
 //Compile styles
 gulp.task('styles', function() {
@@ -224,7 +238,7 @@ gulp.task('serverUnitTests', function(){
 
 //Delete Ionic Platform Files
 gulp.task('buildIos', shell.task(['npm run-script rebuild']));
-gulp.task('clientBuildTasks', ['clean', 'connect', 'clientLint', 'templateCache', 'browserify', 'styles', 'index', 'clientWatch']);
+gulp.task('clientBuildTasks', ['clean', 'connect', 'clientLint', 'templateCache', 'browserify', 'styles', 'oauthcallback', 'index', 'clientWatch']);
 gulp.task('serverBuildTasks', ['serverLint', 'serverUnitTests', 'serve']);
 gulp.task('clientTestingTasks', ['karma', 'protractor']);
 gulp.task('serverTestingTasks', ['serverUnitTests']);

@@ -1,19 +1,48 @@
-// Ionic Starter App
+'use strict';
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+(function(){
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+  //Global object for storing callback functions
+  window._app = {};
+
+  var defaultRouteConfig = function($urlRouterProvider){
+    $urlRouterProvider.otherwise('/signup');
+    console.log('Main config block');
+  };
+
+  var mainRunBlock = function($ionicPlatform) {
+    $ionicPlatform.ready(function() {
+
+      console.log('main run block');
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if(window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      }
+      if(window.StatusBar) {
+        StatusBar.styleDefault();
+      }
+    });
+  };
+
+
+  angular
+    .module('app', [
+      'ionic',
+      'app.login',
+      'app.signup',
+      'restangular'])
+
+    .config(['$urlRouterProvider', defaultRouteConfig])
+    .run(['$ionicPlatform', mainRunBlock]);
+
+  //app modules
+  require('./modules/templateCache.js');
+  require('./modules/login/login.js');
+  require('./modules/signup/signup.js');
+
+  //library modules
+  window._ = require('lodash');
+  require('restangular');
+
+})();
