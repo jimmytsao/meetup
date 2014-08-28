@@ -92,6 +92,9 @@
 'use strict';
 
 (function(){
+
+  console.log('process.env.fbCallbackNonCordova: ', process.env.fbCallbackNonCordova);
+
   angular
     .module('app.login.authValues',[])
     .value('facebookParams', {

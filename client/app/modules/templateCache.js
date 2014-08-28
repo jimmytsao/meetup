@@ -1,1 +1,2 @@
-angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("index.html","<!DOCTYPE html>\n<html>\n  <head>\n  <script type=\"text/javascript\" src=\'js/app.js\'></script>\n  </head>\n  <body>\n  </body>\n</html>");}]);
+angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<button ng-click=\'LoginController.signup()\'>fb</button>\n");
+$templateCache.put("signup/signupTemplate.html","<button ui-sref=\'login\'>login</button>\n");}]);
