@@ -26,9 +26,10 @@
   angular
     .module('app', [
       'ionic',
+      'restangular',
       'app.login',
       'app.signup',
-      'restangular'])
+      'app.main'])
 
     .config(['$urlRouterProvider', defaultRouteConfig])
     .run(['$ionicPlatform', mainRunBlock]);
@@ -37,6 +38,7 @@
   require('./modules/templateCache.js');
   require('./modules/login/login.js');
   require('./modules/signup/signup.js');
+  require('./modules/main/main.js');
 
   //library modules
   window._ = require('lodash');

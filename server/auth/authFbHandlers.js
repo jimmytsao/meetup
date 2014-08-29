@@ -47,7 +47,10 @@ var updateUserProfile = function(userModel, fbProfileInfo, accessToken){
   })
   .save()
   .then(function(){
-    return userModel.get('users_pk');
+    return { 
+      users_pk: userModel.get('users_pk'), 
+      isNewUser: false
+    };
   });
 
 };
@@ -64,18 +67,25 @@ var createUserProfile = function(fbProfileInfo, accessToken){
   return userModel
   .save()
   .then(function(){
-    return userModel.get('users_pk');
+    return { 
+      users_pk: userModel.get('users_pk'), 
+      isNewUser: true
+    };
   });
 
 };
 
 //TAKE OUT FBPROFILEINFO
-var sendJWT = function(user_pk, res, fbProfileInfo){
-  var payload = {id: user_pk};
+var sendJWT = function(accountDetails, res, fbProfileInfo){
+  var payload = {id: accountDetails.user_pk};
   var token = jwt.sign(payload, jwtConstants.secret, {expiresInMinutes: jwtConstants.expirationInMinutes});
 
-  //TAKE OUT FBPROFILEINFO
-  res.status(200).send({token: token, fbProfileInfo: fbProfileInfo});
+  res.status(200).send({
+    token: token, 
+    isNewUser: accountDetails.isNewUser, 
+    //TAKE OUT FBPROFILEINFO
+    fbProfileInfo: fbProfileInfo
+  });
 };
 
 
@@ -110,9 +120,9 @@ module.exports.fbLogin = function(req, res){
     }
   })
 
-  .then(function(user_pk){
+  .then(function(accountDetails){
 
     //TAKE OUT FBPROFILEINFO
-    sendJWT(user_pk, res, fbProfileInfo);
+    sendJWT(accountDetails, res, fbProfileInfo);
   });
 };

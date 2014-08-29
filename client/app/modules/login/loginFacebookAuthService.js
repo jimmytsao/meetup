@@ -43,13 +43,19 @@
           //REMOVE WHEN NOT IN USE
           profileInfo = data.fbProfileInfo;
 
-          $state.go('signup');
+
+          //If new user - Go to signup
+          if(data.isNewUser){
+            $state.go('signup');
+          } else {
+            $state.go('main.dashboard');
+          }
         });
     };
 
     //REMOVE WHEN NOT IN USE
     var profileInfo;
-    this.fbProfileInfo = function(){return profileInfo};
+    this.fbProfileInfo = function(){return profileInfo;};
   };
 
   angular
