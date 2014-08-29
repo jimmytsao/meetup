@@ -2,9 +2,9 @@
 
 (function(){
 
-  var facebookAuthService = function(facebookParams, $window, $q, Restangular){
+  var facebookAuthService = function(facebookParams, $window, $q, Restangular, $state){
 
-    var isCordovaDevice        = false;
+    var isCordovaDevice = false;
     var loginUrlWithParameters = facebookParams.loginUrl + '?client_id=' + facebookParams.appId + '&display=popup' + '&scope=user_photos' + '&redirect_uri=';
     var newBrowserWindow;
     var deferred;
@@ -25,11 +25,11 @@
     };
     
     this.login = function(){
-      console.log($window.test, 'test');
       deferred = $q.defer();
       newBrowserWindow = $window.open(loginUrlWithParameters, '_blank', 'location=no');
       return deferred.promise;
     };
+
 
     this.sendAuthCode = function(url){
       var code = url.split('code=')[1];
@@ -40,16 +40,21 @@
           console.log('data ', data);
           $window.localStorage.jwt = data.token;
 
-          console.log('jwt ', $window.localStorage.jwt);
+          //REMOVE WHEN NOT IN USE
+          profileInfo = data.fbProfileInfo;
+
+          $state.go('signup');
         });
     };
 
-    console.log('auth provider');
+    //REMOVE WHEN NOT IN USE
+    var profileInfo;
+    this.fbProfileInfo = function(){return profileInfo};
   };
 
   angular
     .module('app.login.facebookAuthService', [])
-    .service('fbAuth', ['facebookParams', '$window', '$q', 'Restangular', facebookAuthService]);
+    .service('fbAuth', ['facebookParams', '$window', '$q', 'Restangular','$state', facebookAuthService]);
 
 })();
 

@@ -69,11 +69,13 @@ var createUserProfile = function(fbProfileInfo, accessToken){
 
 };
 
-var sendJWT = function(user_pk, res){
+//TAKE OUT FBPROFILEINFO
+var sendJWT = function(user_pk, res, fbProfileInfo){
   var payload = {id: user_pk};
   var token = jwt.sign(payload, jwtConstants.secret, {expiresInMinutes: jwtConstants.expirationInMinutes});
 
-  res.status(200).send({token: token});
+  //TAKE OUT FBPROFILEINFO
+  res.status(200).send({token: token, fbProfileInfo: fbProfileInfo});
 };
 
 
@@ -109,6 +111,8 @@ module.exports.fbLogin = function(req, res){
   })
 
   .then(function(user_pk){
-    sendJWT(user_pk, res);
+
+    //TAKE OUT FBPROFILEINFO
+    sendJWT(user_pk, res, fbProfileInfo);
   });
 };

@@ -6,14 +6,11 @@
   window._app = {};
 
   var defaultRouteConfig = function($urlRouterProvider){
-    $urlRouterProvider.otherwise('/signup');
-    console.log('Main config block');
+    $urlRouterProvider.otherwise('/login');
   };
 
   var mainRunBlock = function($ionicPlatform) {
     $ionicPlatform.ready(function() {
-
-      console.log('main run block');
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
       if(window.cordova && window.cordova.plugins.Keyboard) {

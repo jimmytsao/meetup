@@ -1,0 +1,22 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  // height: 568px;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #EAEAEA;
+}
+
+.login-title {
+  color: #0000D6;
+  margin-bottom: 30%;
+  font-size: 9vh;
+}
+
+.login-fb-login-button{
+  padding: 2%;
+  background-color: #3B5998;
+  color: white;
+  border-radius: 6px;
+}

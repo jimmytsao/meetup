@@ -7,14 +7,11 @@
   window._app = {};
 
   var defaultRouteConfig = function($urlRouterProvider){
-    $urlRouterProvider.otherwise('/signup');
-    console.log('Main config block');
+    $urlRouterProvider.otherwise('/login');
   };
 
   var mainRunBlock = function($ionicPlatform) {
     $ionicPlatform.ready(function() {
-
-      console.log('main run block');
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
       if(window.cordova && window.cordova.plugins.Keyboard) {
@@ -60,16 +57,6 @@
         templateUrl: 'login/loginTemplate.html',
         controller: 'LoginController as LoginController'
       });
-
-      console.log('login config block');
-  };
-
-  var loginRunBlock = function($log){
-    $log.info('login run block1');
-  };
-
-  var loginRunBlock2 = function($log){
-    $log.info('login run block2');
   };
 
   angular
@@ -77,9 +64,7 @@
       'app.login.authValues',
       'app.login.facebookAuthService',
       'app.login.controllers'])
-    .config(['$stateProvider', loginRoutesConfig])
-    .run(['$log', '$ionicPlatform', loginRunBlock])
-    .run(['$log', loginRunBlock2]);
+    .config(['$stateProvider', loginRoutesConfig]);
   
   require('./loginAuthValues.js');
   require('./loginFacebookAuthService.js');
@@ -99,6 +84,7 @@
       appId: 678308422257930,
       oauthRedirectUrl: 'http://localhost/#/auth/fb',
       oauthRedirectUrlNonCordova: 'http://jtmeetup.azurewebsites.net/oauthcallback.html'
+      // oauthRedirectUrlNonCordova: 'http://localhost:8000/oauthcallback.html'
     });
 })();
 },{}],4:[function(require,module,exports){
@@ -106,16 +92,11 @@
 
 (function(){
 
-
   var LoginController = function(fbAuth){
-    console.log('Login Controller');
-
     this.signup = function(){
-      console.log('this.signup clicked');
       fbAuth.login()
       .then(fbAuth.sendAuthCode);
     };
-
   };
 
   angular
@@ -127,9 +108,9 @@
 
 (function(){
 
-  var facebookAuthService = function(facebookParams, $window, $q, Restangular){
+  var facebookAuthService = function(facebookParams, $window, $q, Restangular, $state){
 
-    var isCordovaDevice        = false;
+    var isCordovaDevice = false;
     var loginUrlWithParameters = facebookParams.loginUrl + '?client_id=' + facebookParams.appId + '&display=popup' + '&scope=user_photos' + '&redirect_uri=';
     var newBrowserWindow;
     var deferred;
@@ -150,11 +131,11 @@
     };
     
     this.login = function(){
-      console.log($window.test, 'test');
       deferred = $q.defer();
       newBrowserWindow = $window.open(loginUrlWithParameters, '_blank', 'location=no');
       return deferred.promise;
     };
+
 
     this.sendAuthCode = function(url){
       var code = url.split('code=')[1];
@@ -165,16 +146,21 @@
           console.log('data ', data);
           $window.localStorage.jwt = data.token;
 
-          console.log('jwt ', $window.localStorage.jwt);
+          //REMOVE WHEN NOT IN USE
+          profileInfo = data.fbProfileInfo;
+
+          $state.go('signup');
         });
     };
 
-    console.log('auth provider');
+    //REMOVE WHEN NOT IN USE
+    var profileInfo;
+    this.fbProfileInfo = function(){return profileInfo};
   };
 
   angular
     .module('app.login.facebookAuthService', [])
-    .service('fbAuth', ['facebookParams', '$window', '$q', 'Restangular', facebookAuthService]);
+    .service('fbAuth', ['facebookParams', '$window', '$q', 'Restangular','$state', facebookAuthService]);
 
 })();
 
@@ -191,25 +177,13 @@
         templateUrl: 'signup/signupTemplate.html',
         controller: 'SignupController as SignupController'
       });
-
-      console.log('signup config block');
-  };
-
-  var signinRunBlock = function($log){
-    $log.info('signin run block1');
-  };
-
-  var signinRunBlock2 = function($log){
-    $log.info('signin run block2');
   };
 
 
   angular
     .module('app.signup', ['app.signup.controllers'])
-    .config(['$stateProvider', signupRoutesConfig])
-    .run(['$log', signinRunBlock])
-    .run(['$log', signinRunBlock2]);
-  
+    .config(['$stateProvider', signupRoutesConfig]);
+
   require('./signupControllers.js');
 
 })();
@@ -219,18 +193,20 @@
 
 (function(){
 
-  var SignupController = function(){
-    console.log('Signup Controller');
+  var SignupController = function(fbAuth){
+    console.log('signup controller');
+    console.log('auth ', fbAuth.fbProfileInfo());
+    this.fbProfileInfo = fbAuth.fbProfileInfo();
   };
 
   angular
     .module('app.signup.controllers', [])
-    .controller('SignupController', [SignupController]);
+    .controller('SignupController', ['fbAuth', SignupController]);
 
 })();
 },{}],8:[function(require,module,exports){
-angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<button ng-click=\'LoginController.signup()\'>fb</button>\n");
-$templateCache.put("signup/signupTemplate.html","<button ui-sref=\'login\'>login</button>\n");}]);
+angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<div class=\'login-container\'>\n  <div class=\'login-title\'>Meetup</div>\n  <div class=\'login-fb-login-button\' ng-click=\'LoginController.signup()\'>Login with Facebook</div>\n</div>\n");
+$templateCache.put("signup/signupTemplate.html","<div>\n  Welcome!\n\n  This is your Facebook public profile information:\n\n  {{SignupController.fbProfileInfo}}\n</div>");}]);
 },{}],9:[function(require,module,exports){
 (function (global){
 /**

@@ -18,6 +18,38 @@ html, body, ul, ol {
   margin: 0;
   padding: 0; }
 
+.login-container {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  height: 100vh;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background-color: #EAEAEA; }
+
+.login-title {
+  color: #0000D6;
+  margin-bottom: 30%;
+  font-size: 9vh; }
+
+.login-fb-login-button {
+  padding: 2%;
+  background-color: #3B5998;
+  color: white;
+  border-radius: 6px; }
+
 /*!
   Ionicons, v1.5.2
   Created by Ben Sperry for the Ionic Framework, http://ionicons.com/
