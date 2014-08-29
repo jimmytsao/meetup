@@ -2,14 +2,13 @@
 
 (function(){
 
-  var SignupController = function(fbAuth){
-    console.log('signup controller');
-    console.log('auth ', fbAuth.fbProfileInfo());
+  var SignupController = function(fbAuth, $window){
+    this.firstName = $window.localStorage.getItem('firstName');
     this.fbProfileInfo = fbAuth.fbProfileInfo();
   };
 
   angular
     .module('app.signup.controllers', [])
-    .controller('SignupController', ['fbAuth', SignupController]);
+    .controller('SignupController', ['fbAuth', '$window', SignupController]);
 
 })();

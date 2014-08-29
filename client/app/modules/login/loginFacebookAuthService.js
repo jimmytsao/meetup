@@ -39,6 +39,7 @@
         .then(function(data){
           console.log('data ', data);
           $window.localStorage.jwt = data.token;
+          $window.localStorage.firstName = data.fbProfileInfo.first_name;
 
           //REMOVE WHEN NOT IN USE
           profileInfo = data.fbProfileInfo;
@@ -46,7 +47,7 @@
 
           //If new user - Go to signup
           if(data.isNewUser){
-            $state.go('signup');
+            $state.go('signup.interests');
           } else {
             $state.go('main.dashboard');
           }
