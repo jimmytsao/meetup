@@ -34,15 +34,15 @@ var fetchUserFbProfile = function(token){
 };
 
 var checkIfUserExists = function(profileData){
-  var user = new User({facebookUserId: profileData.id});
+  var user = new User({facebook_user_id: profileData.id});
   return user.fetch();
 };
 
 var updateUserProfile = function(userModel, fbProfileInfo, accessToken){
   return userModel.set({
-    facebookAccessToken: accessToken,
-    firstName: fbProfileInfo.first_name,
-    lastName: fbProfileInfo.last_name,
+    facebook_access_token: accessToken,
+    first_name: fbProfileInfo.first_name,
+    last_name: fbProfileInfo.last_name,
     gender: fbProfileInfo.gender
   })
   .save()
@@ -54,11 +54,11 @@ var updateUserProfile = function(userModel, fbProfileInfo, accessToken){
 
 var createUserProfile = function(fbProfileInfo, accessToken){
   var userModel = new User({
-    facebookUserId: fbProfileInfo.id,
-    firstName: fbProfileInfo.first_name,
-    lastName: fbProfileInfo.last_name,
+    facebook_user_id: fbProfileInfo.id,
+    first_name: fbProfileInfo.first_name,
+    last_name: fbProfileInfo.last_name,
     gender: fbProfileInfo.gender,
-    facebookAccessToken: accessToken
+    facebook_access_token: accessToken
   });
 
   return userModel

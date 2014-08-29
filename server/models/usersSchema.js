@@ -7,11 +7,12 @@ bookshelf.knex.schema.hasTable('users')
     if (!exists) {
       bookshelf.knex.schema.createTable('users', function (table) {
         table.increments('users_pk').primary();
-        table.bigInteger('facebookUserId').unique().notNullable();
-        table.string('firstName');
-        table.string('lastName');
+        table.bigInteger('facebook_user_id').unique().notNullable();
+        table.string('first_name');
+        table.string('last_name');
         table.string('gender');
-        table.string('facebookAccessToken');
+        table.string('facebook_access_token');
+        table.boolean('active_account');
         table.timestamps();
       })
       .then(function (table) {
