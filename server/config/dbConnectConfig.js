@@ -18,4 +18,5 @@ var knex = require('knex')({
 module.exports = require('bookshelf')(knex);
 
 //DB Table Schemas
-require ('../models/usersSchema.js');
+require ('../models/schemas/usersSchema.js');
+require ('../models/schemas/interestsSchema.js');
