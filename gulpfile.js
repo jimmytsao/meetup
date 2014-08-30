@@ -50,7 +50,8 @@ var paths = {
 
   sassFiles: {
     //sassfiles
-    src: ['client/app/styles.scss'],
+    src: ['client/app/**/*.scss'],
+    mainSrc: ['client/app/styles.scss'],
     dest: 'client/ionic/www'
   },
 
@@ -165,7 +166,7 @@ gulp.task('oauthcallback', function() {
 //Compile styles
 gulp.task('styles', function() {
   gulp
-    .src(paths.sassFiles.src)
+    .src(paths.sassFiles.mainSrc)
     // The onerror handler prevents Gulp from crashing when you make a mistake in your SASS
     .pipe(sass({onError: function(e) { console.log('Sass Compilation Error: ',e); } }))
     // Optionally add autoprefixer
