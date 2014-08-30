@@ -77,7 +77,7 @@ var createUserProfile = function(fbProfileInfo, accessToken){
 
 //TAKE OUT FBPROFILEINFO
 var sendJWT = function(accountDetails, res, fbProfileInfo){
-  var payload = {id: accountDetails.user_pk};
+  var payload = {id: accountDetails.users_pk};
   var token = jwt.sign(payload, jwtConstants.secret, {expiresInMinutes: jwtConstants.expirationInMinutes});
 
   res.status(200).send({

@@ -2,7 +2,7 @@
 
 var morgan      = require('morgan');
 var bodyParser  = require('body-parser');
-
+var jwtCheck     = require('../auth/authJWT.js').jwtCheck;
 module.exports = function (app, express) {
 
   app.use(morgan('dev'));
@@ -14,4 +14,8 @@ module.exports = function (app, express) {
   var authHandling = express.Router();
   app.use('/auth', authHandling); 
   require('../auth/authRouting.js')(authHandling);
+
+  var signupHandling = express.Router();
+  app.use('/signup', jwtCheck, signupHandling);
+  require('../signup/signupRouting.js')(signupHandling);
 };

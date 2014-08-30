@@ -33,8 +33,8 @@
 
     this.sendAuthCode = function(url){
       var code = url.split('code=')[1];
-      console.log('code: ', code);
-      Restangular.all('auth/fb')
+
+      return Restangular.all('auth/fb')
         .post({code: code})
         .then(function(data){
           console.log('data ', data);
@@ -44,13 +44,15 @@
           //REMOVE WHEN NOT IN USE
           profileInfo = data.fbProfileInfo;
 
-
           //If new user - Go to signup
           if(data.isNewUser){
             $state.go('signup.interests');
           } else {
             $state.go('main.dashboard');
           }
+        })
+        .catch(function(error){
+          console.log('Failed to convert access code to Token: ', error);
         });
     };
 
