@@ -3,7 +3,6 @@
 (function(){
 
   var dashboardRoutesConfig = function($stateProvider){
-    console.log('in dashboardconfig');
     $stateProvider
       .state('main.dashboard', {
         url: '/dashboard',

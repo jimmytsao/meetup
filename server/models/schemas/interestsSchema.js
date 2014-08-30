@@ -1,6 +1,6 @@
 'use strict';
 
-var bookshelf = require('../config/dbConnectConfig.js');
+var bookshelf = require('../../config/dbConnectConfig.js');
 
 bookshelf.knex.schema.hasTable('interests')
   .then(function(exists) {

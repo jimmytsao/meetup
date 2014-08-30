@@ -1,12 +1,13 @@
 'use strict';
 
-var bookshelf = require('../config/dbConnectConfig.js');
+var bookshelf = require('../../config/dbConnectConfig.js');
 
 bookshelf.knex.schema.hasTable('users')
   .then(function(exists) {
     // if (!exists) {
       bookshelf.knex.schema
 
+        //Remote Later
         .dropTable('users')
         
         .createTable('users', function (table) {
