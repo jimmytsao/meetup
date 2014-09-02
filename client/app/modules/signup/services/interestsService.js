@@ -3,7 +3,10 @@
 (function(){
 
   var SignupInterests = function(Restangular){
-
+    this.getInterests = function(){
+      return Restangular.all('signup/interests')
+      .getList();
+    };
   };
 
   angular

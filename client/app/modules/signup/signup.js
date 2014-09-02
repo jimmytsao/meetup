@@ -8,6 +8,11 @@
         url: '/signup',
         templateUrl: 'signup/templates/signupTemplate.html',
         controller: 'SignupController as SignupController',
+        resolve: {
+          interests: function(SignupInterests){
+            return SignupInterests.getInterests();
+          }
+        },
         abstract: true
       })
       .state('signup.interests', {

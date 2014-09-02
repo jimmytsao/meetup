@@ -1,3 +1,28 @@
-<div>
-  Profile
+<ion-header-bar align-title="center" class="bar-positive">
+  <h1 class="title">Welcome {{SignupController.firstName}}!</h1>
+</ion-header-bar>
+
+<!-- added class bar-subheader to create fixed subheader -->
+<ion-header-bar align-title="center" class="bar-positive bar-subheader">
+Step 2: Set Profile then click <a ui-sref='signup.invite'><div class=signup-next-button>next</div></a>
+</ion-header-bar>
+
+<ion-content>
+
+<div class="card">
+  <div class="item item-text-wrap">
+     Select picture from Facebook profile
+    <div>&lt profile pic &gt &lt profile pic &gt &lt profile pic &gt</div>
+  </div>
 </div>
+
+<div class="card">
+  <div class="item item-text-wrap">
+    <div> Describe Yourself:</div>
+    <label class="item item-input">
+      <textarea rows="6" cols="20" ng-model="SignupController.bio"></textarea>
+    </label>
+  </div>
+</div>
+
+</ion-content>

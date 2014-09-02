@@ -2,8 +2,9 @@
 
 var bookshelf = require('../config/dbConnectConfig.js');
 
+
 module.exports = bookshelf.Model.extend({
-  tablename: 'interests',
+  tableName: 'interests',
   idAttribute: 'interests_pk',
   hasTimestamps: true
 });

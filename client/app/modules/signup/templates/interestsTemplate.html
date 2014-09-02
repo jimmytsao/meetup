@@ -1,4 +1,27 @@
-<div>
+<ion-header-bar align-title="center" class="bar-positive">
+  <h1 class="title">Welcome {{SignupController.firstName}}!</h1>
+</ion-header-bar>
 
-  <a ui-sref='signup.profile'>interests</a>
-</div>
+<!-- added class bar-subheader to create fixed subheader -->
+<ion-header-bar align-title="center" class="bar-positive bar-subheader">
+Step 1: Add interests then click <a ui-sref='signup.profile'><div class=signup-next-button>next</div></a>
+</ion-header-bar>
+
+<ion-content>
+  <div class="bar bar-header item-input-inset">
+    <label class="item-input-wrapper">
+      <input type="search" placeholder="Search" ng-model='SignupController.interestsFilter'>
+    </label>
+    <button class="button button-clear" ng-click='SignupController.clearFilter()'>
+      Cancel
+    </button>
+  </div>
+  <ul class="list">
+    <li class="item item-checkbox" ng-repeat="interest in SignupController.interests | filter:SignupController.interestsFilter">
+       <label class="checkbox">
+         <input type="checkbox" ng-model="interest['selected']">
+       </label>
+       {{interest.interests_name}}
+    </li>
+  </ul>
+</ion-content>
