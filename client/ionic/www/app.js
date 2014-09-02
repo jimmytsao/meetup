@@ -12,8 +12,7 @@
 
   var mainRunBlock = function($ionicPlatform) {
     $ionicPlatform.ready(function() {
-      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-      // for form inputs)
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard for form inputs)
       if(window.cordova && window.cordova.plugins.Keyboard) {
         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       }
@@ -23,21 +22,51 @@
     });
   };
 
+  var restangularConfig = function(Restangular, $window, $state){
+
+    var jwtRequestInterceptor = function(element, operation, route, url, headers, params, httpConfig){
+      var jwt = $window.localStorage.getItem('jwt');
+      if (jwt){
+        headers['x-access-token'] = jwt;
+      }
+      return {
+        headers: headers
+      };
+    };
+
+    var errorResponseInterceptor = function(response, deferred, responseHandler) {
+      var isUnauthorized = response.status === 401;
+      var routeToLogin = response.data ? response.data.routeToLogin : false;
+
+      if (isUnauthorized && routeToLogin){
+        console.log('Unauthorized, Error Response Interceptor: ', response);
+        $state.go('login');
+      }
+    };
+
+    Restangular.setErrorInterceptor(errorResponseInterceptor);
+    Restangular.addFullRequestInterceptor(jwtRequestInterceptor);
+  };
 
   angular
     .module('app', [
       'ionic',
+      'restangular',
       'app.login',
       'app.signup',
-      'restangular'])
+      'app.main'])
 
     .config(['$urlRouterProvider', defaultRouteConfig])
+
+    .run(['Restangular', '$window', '$state', restangularConfig])
+
     .run(['$ionicPlatform', mainRunBlock]);
 
   //app modules
   require('./modules/templateCache.js');
   require('./modules/login/login.js');
   require('./modules/signup/signup.js');
+  require('./modules/main/main.js');
 
   //library modules
   window._ = require('lodash');
@@ -45,7 +74,42 @@
 
 })();
 
-},{"./modules/login/login.js":2,"./modules/signup/signup.js":6,"./modules/templateCache.js":8,"lodash":9,"restangular":10}],2:[function(require,module,exports){
+},{"./modules/login/login.js":4,"./modules/main/main.js":8,"./modules/signup/signup.js":10,"./modules/templateCache.js":12,"lodash":13,"restangular":14}],2:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var dashboardRoutesConfig = function($stateProvider){
+    $stateProvider
+      .state('main.dashboard', {
+        url: '/dashboard',
+        templateUrl: 'dashboard/dashboardTemplate.html',
+        controller: 'DashboardController as DashboardController'
+      });
+  };
+
+  angular
+    .module('app.main.dashboard', [
+      'app.main.dashboard.controllers'])
+    .config(['$stateProvider', dashboardRoutesConfig]);
+
+  require('./dashboardControllers.js');
+})();
+},{"./dashboardControllers.js":3}],3:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var DashboardController = function(){
+    this.hello = 'hello';
+  };
+
+  angular
+    .module('app.main.dashboard.controllers',[])
+    .controller('DashboardController', [DashboardController]);
+    
+})();
+},{}],4:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -72,7 +136,7 @@
 
 })();
 
-},{"./loginAuthValues.js":3,"./loginControllers.js":4,"./loginFacebookAuthService.js":5}],3:[function(require,module,exports){
+},{"./loginAuthValues.js":5,"./loginControllers.js":6,"./loginFacebookAuthService.js":7}],5:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -83,11 +147,11 @@
       loginUrl: 'https://www.facebook.com/dialog/oauth',
       appId: 678308422257930,
       oauthRedirectUrl: 'http://localhost/#/auth/fb',
-      oauthRedirectUrlNonCordova: 'http://jtmeetup.azurewebsites.net/oauthcallback.html'
-      // oauthRedirectUrlNonCordova: 'http://localhost:8000/oauthcallback.html'
+      // oauthRedirectUrlNonCordova: 'http://jtmeetup.azurewebsites.net/oauthcallback.html'
+      oauthRedirectUrlNonCordova: 'http://localhost:8000/oauthcallback.html'
     });
 })();
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -103,7 +167,7 @@
     .module('app.login.controllers', [])
     .controller('LoginController', ['fbAuth', LoginController]);
 })();
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -139,23 +203,32 @@
 
     this.sendAuthCode = function(url){
       var code = url.split('code=')[1];
-      console.log('code: ', code);
-      Restangular.all('auth/fb')
+
+      return Restangular.all('auth/fb')
         .post({code: code})
         .then(function(data){
           console.log('data ', data);
           $window.localStorage.jwt = data.token;
+          $window.localStorage.firstName = data.fbProfileInfo.first_name;
 
           //REMOVE WHEN NOT IN USE
           profileInfo = data.fbProfileInfo;
 
-          $state.go('signup');
+          //If new user - Go to signup
+          if(data.isNewUser){
+            $state.go('signup.interests');
+          } else {
+            $state.go('main.dashboard');
+          }
+        })
+        .catch(function(error){
+          console.log('Failed to convert access code to Token: ', error);
         });
     };
 
     //REMOVE WHEN NOT IN USE
     var profileInfo;
-    this.fbProfileInfo = function(){return profileInfo};
+    this.fbProfileInfo = function(){return profileInfo;};
   };
 
   angular
@@ -165,7 +238,44 @@
 })();
 
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var mainRoutesConfig = function($stateProvider){
+    $stateProvider
+      .state('main', {
+        url: '/main',
+        templateUrl: 'main/mainTemplate.html',
+        abstract: true
+      });
+  };
+
+  angular
+    .module('app.main',[
+      'app.main.dashboard'])
+    .config(['$stateProvider', mainRoutesConfig]);
+
+  require('../dashboard/dashboard.js');
+})();
+},{"../dashboard/dashboard.js":2}],9:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var SignupInterests = function(Restangular){
+    this.getInterests = function(){
+      return Restangular.all('signup/interests')
+      .getList();
+    };
+  };
+
+  angular
+    .module('app.signup.services.interest', [])
+    .service('SignupInterests', ['Restangular', SignupInterests]);
+})();
+},{}],10:[function(require,module,exports){
 'use strict';
 (function(){
 
@@ -174,40 +284,76 @@
     $stateProvider
       .state('signup', {
         url: '/signup',
-        templateUrl: 'signup/signupTemplate.html',
-        controller: 'SignupController as SignupController'
+        templateUrl: 'signup/templates/signupTemplate.html',
+        controller: 'SignupController as SignupController',
+        resolve: {
+          interests: function(SignupInterests){
+            return SignupInterests.getInterests();
+          }
+        },
+        abstract: true
+      })
+      .state('signup.interests', {
+        url: '/interests',
+        templateUrl: 'signup/templates/interestsTemplate.html'
+      })
+      .state('signup.profile', {
+        url: '/profile',
+        templateUrl: 'signup/templates/profileTemplate.html'
+      })
+      .state('signup.invite', {
+        url: '/invite',
+        templateUrl: 'signup/templates/inviteTemplate.html'
       });
   };
 
 
   angular
-    .module('app.signup', ['app.signup.controllers'])
+    .module('app.signup', [
+      'app.signup.controllers',
+
+      'app.signup.services.interest'])
     .config(['$stateProvider', signupRoutesConfig]);
 
+  //Controllers
   require('./signupControllers.js');
 
+  //Services
+  require('./services/interestsService.js');
 })();
 
-},{"./signupControllers.js":7}],7:[function(require,module,exports){
+},{"./services/interestsService.js":9,"./signupControllers.js":11}],11:[function(require,module,exports){
 'use strict';
 
 (function(){
 
-  var SignupController = function(fbAuth){
-    console.log('signup controller');
-    console.log('auth ', fbAuth.fbProfileInfo());
-    this.fbProfileInfo = fbAuth.fbProfileInfo();
+  var SignupController = function($window, SignupInterests, interests){
+    this.firstName = $window.localStorage.getItem('firstName');
+    this.interests = interests;
+
+    this.disp = function(){
+      console.log('interests: ', this.bio, this.interests);
+    };
+
+    this.clearFilter = function(){
+      this.interestsFilter = '';
+    };
   };
 
   angular
     .module('app.signup.controllers', [])
-    .controller('SignupController', ['fbAuth', SignupController]);
+    .controller('SignupController', ['$window', 'SignupInterests', 'interests', SignupController]);
 
 })();
-},{}],8:[function(require,module,exports){
-angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<div class=\'login-container\'>\n  <div class=\'login-title\'>Meetup</div>\n  <div class=\'login-fb-login-button\' ng-click=\'LoginController.signup()\'>Login with Facebook</div>\n</div>\n");
-$templateCache.put("signup/signupTemplate.html","<div>\n  Welcome!\n\n  This is your Facebook public profile information:\n\n  {{SignupController.fbProfileInfo}}\n</div>");}]);
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
+angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("dashboard/dashboardTemplate.html","<div>\n  Inside dashboard Template\n</div>");
+$templateCache.put("login/loginTemplate.html","<div class=\'login-container\'>\n  <div class=\'login-title\'>Meetup</div>\n  <div class=\'login-fb-login-button\' ng-click=\'LoginController.signup()\'>Login with Facebook</div>\n</div>\n");
+$templateCache.put("main/mainTemplate.html","<div>\n  <ion-nav-view></ion-nav-view>\n  test\n</div>\n");
+$templateCache.put("signup/templates/interestsTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 1: Add interests then click <a ui-sref=\'signup.profile\'><div class=signup-next-button>next</div></a>\n</ion-header-bar>\n\n<ion-content>\n  <div class=\"bar bar-header item-input-inset\">\n    <label class=\"item-input-wrapper\">\n      <input type=\"search\" placeholder=\"Search\" ng-model=\'SignupController.interestsFilter\'>\n    </label>\n    <button class=\"button button-clear\" ng-click=\'SignupController.clearFilter()\'>\n      Cancel\n    </button>\n  </div>\n  <ul class=\"list\">\n    <li class=\"item item-checkbox\" ng-repeat=\"interest in SignupController.interests | filter:SignupController.interestsFilter\">\n       <label class=\"checkbox\">\n         <input type=\"checkbox\" ng-model=\"interest[\'selected\']\">\n       </label>\n       {{interest.interests_name}}\n    </li>\n  </ul>\n</ion-content>\n");
+$templateCache.put("signup/templates/inviteTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 3: Invite your friends and then click  <a ui-sref=\'signup.invite\'><div class=signup-next-button>finish</div></a>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Add friends\n  </div>\n</div>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Invite Facebook friends\n  </div>\n</div>\n\n</ion-content>\n");
+$templateCache.put("signup/templates/profileTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 2: Set Profile then click <a ui-sref=\'signup.invite\'><div class=signup-next-button>next</div></a>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Select picture from Facebook profile\n    <div>&lt profile pic &gt &lt profile pic &gt &lt profile pic &gt</div>\n  </div>\n</div>\n  \n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n    <div> Describe Yourself:</div>\n    <label class=\"item item-input\">\n      <textarea rows=\"6\" cols=\"20\" ng-model=\"SignupController.bio\"></textarea>\n    </label>\n  </div>\n</div>\n\n</ion-content>\n");
+$templateCache.put("signup/templates/signupTemplate.html","<ion-nav-view></ion-nav-view>\n");}]);
+},{}],13:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -6996,7 +7142,7 @@ $templateCache.put("signup/signupTemplate.html","<div>\n  Welcome!\n\n  This is 
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * Restful Resources service for AngularJS apps
  * @version v1.4.0 - 2014-04-25 * @link https://github.com/mgonto/restangular
