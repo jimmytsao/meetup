@@ -4,11 +4,11 @@ var bookshelf = require('../../config/dbConnectConfig.js');
 
 bookshelf.knex.schema.hasTable('users')
   .then(function(exists) {
-    // if (!exists) {
+    if (!exists) {
       bookshelf.knex.schema
 
-        //Remote Later
-        .dropTable('users')
+        // Remove Later
+        // .dropTable('users')
         
         .createTable('users', function (table) {
         table.increments('users_pk').primary();
@@ -18,10 +18,11 @@ bookshelf.knex.schema.hasTable('users')
         table.string('gender');
         table.string('facebook_access_token');
         table.boolean('active_account');
+        table.boolean('completed_setup');
         table.timestamps();
       })
       .then(function (table) {
         console.log('Created Table', table);
       });
-    // }
+    }
   });

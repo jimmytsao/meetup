@@ -34,7 +34,8 @@
     .module('app.signup', [
       'app.signup.controllers',
 
-      'app.signup.services.interest'])
+      'app.signup.services.interest',
+      'app.signup.services.submission'])
     .config(['$stateProvider', signupRoutesConfig]);
 
   //Controllers
@@ -42,4 +43,5 @@
 
   //Services
   require('./services/interestsService.js');
+  require('./services/submissionService.js');
 })();

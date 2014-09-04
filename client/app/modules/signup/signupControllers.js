@@ -2,21 +2,21 @@
 
 (function(){
 
-  var SignupController = function($window, SignupInterests, interests){
+  var SignupController = function($window, SignupSubmission, interests){
     this.firstName = $window.localStorage.getItem('firstName');
     this.interests = interests;
 
-    this.disp = function(){
-      console.log('interests: ', this.bio, this.interests);
-    };
-
     this.clearFilter = function(){
       this.interestsFilter = '';
+    };
+
+    this.submit = function(){
+      SignupSubmission.submit(this.interests, this.bio);
     };
   };
 
   angular
     .module('app.signup.controllers', [])
-    .controller('SignupController', ['$window', 'SignupInterests', 'interests', SignupController]);
+    .controller('SignupController', ['$window', 'SignupSubmission', 'interests', SignupController]);
 
 })();

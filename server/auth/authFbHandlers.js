@@ -3,7 +3,7 @@
 var request = require('../common/helpers.js').request;
 var fbConstants = require('./authConstants.js').fb;
 var jwtConstants = require('./authConstants.js').jwt;
-var User = require('../models/user.js');
+var User = require('../models/users.js');
 var jwt = require('jsonwebtoken');
 
 var fbTokenUrlGenerator = function(accessCode){
@@ -47,9 +47,15 @@ var updateUserProfile = function(userModel, fbProfileInfo, accessToken){
   })
   .save()
   .then(function(){
+    var isNewUser = true;
+
+    if (userModel.get('completed_setup') === true){
+      isNewUser = false;
+    }
+
     return { 
       users_pk: userModel.get('users_pk'), 
-      isNewUser: false
+      isNewUser: isNewUser
     };
   });
 
