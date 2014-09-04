@@ -37,7 +37,6 @@
       return Restangular.all('auth/fb')
         .post({code: code})
         .then(function(data){
-          console.log('data ', data);
           $window.localStorage.jwt = data.token;
           $window.localStorage.firstName = data.fbProfileInfo.first_name;
 
