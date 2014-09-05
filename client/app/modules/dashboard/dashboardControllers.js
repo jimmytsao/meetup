@@ -2,12 +2,12 @@
 
 (function(){
 
-  var DashboardController = function(){
-    this.hello = 'hello';
+  var DashboardController = function(Restangular, userInterests){
+    this.userInterests = userInterests;
   };
 
   angular
     .module('app.main.dashboard.controllers',[])
-    .controller('DashboardController', [DashboardController]);
+    .controller('DashboardController', ['Restangular', 'userInterests', DashboardController]);
     
 })();

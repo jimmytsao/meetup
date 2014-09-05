@@ -18,4 +18,8 @@ module.exports = function (app, express) {
   var signupHandling = express.Router();
   app.use('/signup', jwtCheck, signupHandling);
   require('../signup/signupRouting.js')(signupHandling);
+
+  var dashboardHandling = express.Router();
+  app.use('/dashboard', jwtCheck, dashboardHandling);
+  require('../dashboard/dashboardRouting')(dashboardHandling);
 };
