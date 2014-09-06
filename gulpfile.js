@@ -113,14 +113,14 @@ gulp.task('connect', function() {
 
 //Convert all html partials for the app and add them to the $templateCache in the 'app' module
 gulp.task('templateCache', function(){
-	gulp
+	return gulp
     .src(paths.htmlTemplates.src)
 		.pipe(templateCache(paths.htmlTemplates.templateCacheName,{module: paths.ngAppName}))
 		.pipe(gulp.dest(paths.htmlTemplates.dest));
 });
 
 //Concatenate all of the dependencies in app.js via Browserify
-gulp.task('browserify', function(){
+gulp.task('browserify', ['templateCache'], function(){
   gulp
     .src([paths.mainClientAppFile])
     .pipe(browserify())
