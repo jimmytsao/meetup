@@ -22,3 +22,4 @@ require ('../models/schemas/users_Schema.js');
 require ('../models/schemas/interests_Schema.js');
 require ('../models/schemas/users_interests_map_Schema.js');
 require ('../models/schemas/users_profiles_Schema.js');
+require ('../models/schemas/users_locations_Schema.js');
