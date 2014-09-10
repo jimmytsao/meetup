@@ -74,7 +74,7 @@
 
 })();
 
-},{"./modules/login/login.js":4,"./modules/main/main.js":8,"./modules/signup/signup.js":10,"./modules/templateCache.js":12,"lodash":13,"restangular":14}],2:[function(require,module,exports){
+},{"./modules/login/login.js":5,"./modules/main/main.js":9,"./modules/signup/signup.js":12,"./modules/templateCache.js":14,"lodash":15,"restangular":16}],2:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -84,32 +84,59 @@
       .state('main.dashboard', {
         url: '/dashboard',
         templateUrl: 'dashboard/dashboardTemplate.html',
-        controller: 'DashboardController as DashboardController'
+        controller: 'DashboardController as DashboardController',
+        resolve: {
+          userInterests: function (DashboardInterests){
+            return DashboardInterests.getInterests();
+          }
+        }
       });
   };
 
   angular
     .module('app.main.dashboard', [
-      'app.main.dashboard.controllers'])
+      'app.main.dashboard.controllers',
+      'app.main.dashboard.services.dashboardInterests'])
     .config(['$stateProvider', dashboardRoutesConfig]);
 
   require('./dashboardControllers.js');
+
+  require('./services/dashboardInterestsService.js');
 })();
-},{"./dashboardControllers.js":3}],3:[function(require,module,exports){
+},{"./dashboardControllers.js":3,"./services/dashboardInterestsService.js":4}],3:[function(require,module,exports){
 'use strict';
 
 (function(){
 
-  var DashboardController = function(){
-    this.hello = 'hello';
+  var DashboardController = function(Restangular, userInterests){
+    this.userInterests = userInterests;
+    this.log = function(data){
+      console.log('interests_pk: ',data);
+    };
   };
 
   angular
     .module('app.main.dashboard.controllers',[])
-    .controller('DashboardController', [DashboardController]);
+    .controller('DashboardController', ['Restangular', 'userInterests', DashboardController]);
     
 })();
 },{}],4:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var dashboardInterests = function(Restangular){
+    this.getInterests = function(){
+      return Restangular.all('dashboard')
+      .getList();
+    };
+  };
+
+  angular
+    .module('app.main.dashboard.services.dashboardInterests', [])
+    .service('DashboardInterests', ['Restangular', dashboardInterests]);
+})();
+},{}],5:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -136,7 +163,7 @@
 
 })();
 
-},{"./loginAuthValues.js":5,"./loginControllers.js":6,"./loginFacebookAuthService.js":7}],5:[function(require,module,exports){
+},{"./loginAuthValues.js":6,"./loginControllers.js":7,"./loginFacebookAuthService.js":8}],6:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -151,7 +178,7 @@
       // oauthRedirectUrlNonCordova: 'http://localhost:8000/oauthcallback.html'
     });
 })();
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -167,7 +194,7 @@
     .module('app.login.controllers', [])
     .controller('LoginController', ['fbAuth', LoginController]);
 })();
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -207,7 +234,6 @@
       return Restangular.all('auth/fb')
         .post({code: code})
         .then(function(data){
-          console.log('data ', data);
           $window.localStorage.jwt = data.token;
           $window.localStorage.firstName = data.fbProfileInfo.first_name;
 
@@ -238,7 +264,7 @@
 })();
 
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -259,7 +285,7 @@
 
   require('../dashboard/dashboard.js');
 })();
-},{"../dashboard/dashboard.js":2}],9:[function(require,module,exports){
+},{"../dashboard/dashboard.js":2}],10:[function(require,module,exports){
 'use strict';
 
 (function(){
@@ -275,7 +301,39 @@
     .module('app.signup.services.interest', [])
     .service('SignupInterests', ['Restangular', SignupInterests]);
 })();
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+'use strict';
+
+(function(){
+
+  var SignupSubmission = function(Restangular, $state){
+
+    var parseInterests = function(interests){
+      var isSelectedInterest = function(item){
+        if(item.selected === true){
+          return true;
+        }
+      };
+      return _.pluck(_.filter(interests, isSelectedInterest), 'interests_pk');
+    };
+
+    this.submit = function(interests, bio){
+      return Restangular.all('signup/')
+      .post({interests: parseInterests(interests), bio: bio})
+      .then(function(){
+        $state.go('main.dashboard');
+      })
+      .catch(function(){
+        $state.go('login');
+      });
+    };
+  };
+
+  angular
+    .module('app.signup.services.submission', [])
+    .service('SignupSubmission', ['Restangular', '$state', SignupSubmission]);
+})();
+},{}],12:[function(require,module,exports){
 'use strict';
 (function(){
 
@@ -312,7 +370,8 @@
     .module('app.signup', [
       'app.signup.controllers',
 
-      'app.signup.services.interest'])
+      'app.signup.services.interest',
+      'app.signup.services.submission'])
     .config(['$stateProvider', signupRoutesConfig]);
 
   //Controllers
@@ -320,40 +379,41 @@
 
   //Services
   require('./services/interestsService.js');
+  require('./services/submissionService.js');
 })();
 
-},{"./services/interestsService.js":9,"./signupControllers.js":11}],11:[function(require,module,exports){
+},{"./services/interestsService.js":10,"./services/submissionService.js":11,"./signupControllers.js":13}],13:[function(require,module,exports){
 'use strict';
 
 (function(){
 
-  var SignupController = function($window, SignupInterests, interests){
+  var SignupController = function($window, SignupSubmission, interests){
     this.firstName = $window.localStorage.getItem('firstName');
     this.interests = interests;
 
-    this.disp = function(){
-      console.log('interests: ', this.bio, this.interests);
-    };
-
     this.clearFilter = function(){
       this.interestsFilter = '';
+    };
+
+    this.submit = function(){
+      SignupSubmission.submit(this.interests, this.bio);
     };
   };
 
   angular
     .module('app.signup.controllers', [])
-    .controller('SignupController', ['$window', 'SignupInterests', 'interests', SignupController]);
+    .controller('SignupController', ['$window', 'SignupSubmission', 'interests', SignupController]);
 
 })();
-},{}],12:[function(require,module,exports){
-angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("dashboard/dashboardTemplate.html","<div>\n  Inside dashboard Template\n</div>");
-$templateCache.put("login/loginTemplate.html","<div class=\'login-container\'>\n  <div class=\'login-title\'>Meetup</div>\n  <div class=\'login-fb-login-button\' ng-click=\'LoginController.signup()\'>Login with Facebook</div>\n</div>\n");
-$templateCache.put("main/mainTemplate.html","<div>\n  <ion-nav-view></ion-nav-view>\n  test\n</div>\n");
-$templateCache.put("signup/templates/interestsTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 1: Add interests then click <a ui-sref=\'signup.profile\'><div class=signup-next-button>next</div></a>\n</ion-header-bar>\n\n<ion-content>\n  <div class=\"bar bar-header item-input-inset\">\n    <label class=\"item-input-wrapper\">\n      <input type=\"search\" placeholder=\"Search\" ng-model=\'SignupController.interestsFilter\'>\n    </label>\n    <button class=\"button button-clear\" ng-click=\'SignupController.clearFilter()\'>\n      Cancel\n    </button>\n  </div>\n  <ul class=\"list\">\n    <li class=\"item item-checkbox\" ng-repeat=\"interest in SignupController.interests | filter:SignupController.interestsFilter\">\n       <label class=\"checkbox\">\n         <input type=\"checkbox\" ng-model=\"interest[\'selected\']\">\n       </label>\n       {{interest.interests_name}}\n    </li>\n  </ul>\n</ion-content>\n");
-$templateCache.put("signup/templates/inviteTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 3: Invite your friends and then click  <a ui-sref=\'signup.invite\'><div class=signup-next-button>finish</div></a>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Add friends\n  </div>\n</div>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Invite Facebook friends\n  </div>\n</div>\n\n</ion-content>\n");
-$templateCache.put("signup/templates/profileTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 2: Set Profile then click <a ui-sref=\'signup.invite\'><div class=signup-next-button>next</div></a>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Select picture from Facebook profile\n    <div>&lt profile pic &gt &lt profile pic &gt &lt profile pic &gt</div>\n  </div>\n</div>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n    <div> Describe Yourself:</div>\n    <label class=\"item item-input\">\n      <textarea rows=\"6\" cols=\"20\" ng-model=\"SignupController.bio\"></textarea>\n    </label>\n  </div>\n</div>\n\n</ion-content>\n");
+},{}],14:[function(require,module,exports){
+angular.module("app").run(["$templateCache", function($templateCache) {$templateCache.put("login/loginTemplate.html","<div class=\'login-container\'>\n  <div class=\'login-title\'>Meetup</div>\n  <div class=\'login-fb-login-button\' ng-click=\'LoginController.signup()\'>Login with Facebook</div>\n</div>\n");
+$templateCache.put("dashboard/dashboardTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Dashboard</h1>\n</ion-header-bar>\n\n<ion-content>\n  <div class=\"card\" ng-repeat=\'interest in DashboardController.userInterests\'>\n    <div class=\"item item-text-wrap\">\n      {{interest.interests_name}}\n    </div>\n    <div class=\"item item-divider\">\n      <span ng-click=\"DashboardController.log({{interest.interests_pk}})\"><i class=\"icon ion-person-stalker\"></i> Find Players</span>\n\n      <!-- Find better way to space -->\n      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n      \n      <span ng-click=\"DashboardController.log({{interest.interests_pk}})\"><i class=\"icon ion-star\"></i> Find Events</span>\n    </div>\n  </div>\n</ion-content>\n");
+$templateCache.put("main/mainTemplate.html","<ion-nav-view></ion-nav-view>\n\n<div class=\"tabs-striped tabs-background-positive tabs-color-light\">\n  <div class=\"tabs\">\n    <a class=\"tab-item active\" ui-sref=\"main.dashboard\">\n      <i class=\"icon ion-home\"></i>\n      Test\n    </a>\n    <a class=\"tab-item\" ui-sref=\"#\">\n      <i class=\"icon ion-chatbubbles\"></i>\n      Favorites\n    </a>\n    <a class=\"tab-item\" ui-sref=\"#\">\n      <i class=\"icon ion-star\"></i>\n      Settings\n    </a>\n  </div>\n</div>\n");
+$templateCache.put("signup/templates/interestsTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 1: Add interests then click <a ui-sref=\"signup.profile\"><div class=\"signup-next-button\">next</div></a>\n</ion-header-bar>\n\n<ion-content>\n  <div class=\"bar bar-header item-input-inset\">\n    <label class=\"item-input-wrapper\">\n      <input type=\"search\" placeholder=\"Search\" ng-model=\'SignupController.interestsFilter\'>\n    </label>\n    <button class=\"button button-clear\" ng-click=\'SignupController.clearFilter()\'>\n      Cancel\n    </button>\n  </div>\n  <ul class=\"list\">\n    <li class=\"item item-checkbox\" ng-repeat=\"interest in SignupController.interests | filter:SignupController.interestsFilter\">\n       <label class=\"checkbox\">\n         <input type=\"checkbox\" ng-model=\"interest[\'selected\']\">\n       </label>\n       {{interest.interests_name}}\n    </li>\n  </ul>\n</ion-content>\n");
+$templateCache.put("signup/templates/inviteTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 3: Invite your friends and then click <div class=\"signup-next-button\" ng-click=\'SignupController.submit()\'>finish</div>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Add friends\n  </div>\n</div>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Invite Facebook friends\n  </div>\n</div>\n\n</ion-content>\n");
+$templateCache.put("signup/templates/profileTemplate.html","<ion-header-bar align-title=\"center\" class=\"bar-positive\">\n  <h1 class=\"title\">Welcome {{SignupController.firstName}}!</h1>\n</ion-header-bar>\n\n<!-- added class bar-subheader to create fixed subheader -->\n<ion-header-bar align-title=\"center\" class=\"bar-positive bar-subheader\">\nStep 2: Set Profile then click <a ui-sref=\"signup.invite\"><div class=\"signup-next-button\">next</div></a>\n</ion-header-bar>\n\n<ion-content>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n     Select picture from Facebook profile\n    <div>&lt profile pic &gt &lt profile pic &gt &lt profile pic &gt</div>\n  </div>\n</div>\n\n<div class=\"card\">\n  <div class=\"item item-text-wrap\">\n    <div> Describe Yourself:</div>\n    <label class=\"item item-input\">\n      <textarea rows=\"6\" cols=\"20\" ng-model=\"SignupController.bio\"></textarea>\n    </label>\n  </div>\n</div>\n\n</ion-content>\n");
 $templateCache.put("signup/templates/signupTemplate.html","<ion-nav-view></ion-nav-view>\n");}]);
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -7142,7 +7202,7 @@ $templateCache.put("signup/templates/signupTemplate.html","<ion-nav-view></ion-n
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /**
  * Restful Resources service for AngularJS apps
  * @version v1.4.0 - 2014-04-25 * @link https://github.com/mgonto/restangular
